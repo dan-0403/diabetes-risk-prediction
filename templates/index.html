@@ -107,14 +107,22 @@
 
         <!-- Result -->
         {% if image %}
+<!-- Result -->
+{% if image %}
 <div class="text-center" id="resultSection">
     <h4 class="mt-4">Detection Result:</h4>
+
     <img src="{{ image }}" class="img-fluid preview-img d-block mx-auto" width="400">
+
+    <!-- 👇 PUT MESSAGE HERE -->
+    {% if message %}
+    <div class="text-center mt-3">
+        <h5>{{ message }}</h5>
+    </div>
+    {% endif %}
+
 </div>
 {% endif %}
-
-    </div>
-</div>
 
 <!-- SCRIPT (IMPORTANT: placed at bottom) -->
 <script>

@@ -1,0 +1,45 @@
+from flask import Flask, render_template, request
+from ultralytics import YOLO
+import os
+import uuid
+
+app = Flask(__name__)
+
+# Load your trained model (update path if needed)
+model = YOLO("best.onnx")
+
+UPLOAD_FOLDER = "uploads"
+STATIC_FOLDER = "static"
+
+# Create folders if not exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(STATIC_FOLDER, exist_ok=True)
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/predict", methods=["POST"])
+def predict():
+    file = request.files["image"]
+
+    # Unique filename to avoid overwrite
+    filename = str(uuid.uuid4()) + ".jpg"
+
+    upload_path = os.path.join(UPLOAD_FOLDER, filename)
+    output_path = os.path.join(STATIC_FOLDER, filename)
+
+    # Save uploaded file
+    file.save(upload_path)
+
+    # Run YOLO detection
+    results = model(upload_path)
+
+    # Save result (with bounding boxes)
+    results[0].save(filename=output_path)
+
+    return render_template("index.html", image=output_path)
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)

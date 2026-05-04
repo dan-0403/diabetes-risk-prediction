@@ -23,7 +23,6 @@ def home():
 def predict():
     file = request.files["image"]
 
-    # Unique filename to avoid overwrite
     filename = str(uuid.uuid4()) + ".jpg"
 
     upload_path = os.path.join(UPLOAD_FOLDER, filename)
@@ -35,10 +34,23 @@ def predict():
     # Run YOLO detection
     results = model(upload_path)
 
-    # Save result (with bounding boxes)
-    results[0].save(filename=output_path)
+    # 🔥 CHECK IF ANY VEHICLE IS DETECTED
+    if results[0].boxes is None or len(results[0].boxes) == 0:
+        # No detection → use original image
+        import shutil
+        shutil.copy(upload_path, output_path)
 
-    return render_template("index.html", image=output_path)
+        message = "❌ No vehicle detected in the image."
+    else:
+        # Detection exists → save annotated image
+        results[0].save(filename=output_path)
+        message = "✅ Vehicle detected successfully!"
+
+    return render_template(
+        "index.html",
+        image=output_path,
+        message=message
+    )
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))

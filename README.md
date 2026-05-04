@@ -1,2 +1,2 @@
-# diabetes-risk-prediction
-ML prediction
+# vehicle prdiction YOLO
+class: Ambulance, Bus, Car, Motorcycle, Truck
